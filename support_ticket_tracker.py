@@ -1,4 +1,4 @@
-"""Support ticket tracker: create, assign, update, search and persist tickets."""
+"""Support ticket tracker: create, assign, update, search, persist."""
 import json
 import logging
 
@@ -6,9 +6,12 @@ TICKETS = {}
 OPEN_STATUSES = ("open", "in_progress")
 
 
-def create_ticket(title, description, reporter, priority="medium", category="general",
-                  audit_log=None):
-    """Create a ticket and store it. Return it, or None if the title is blank."""
+def create_ticket(title, description, reporter, priority="medium",
+                  category="general", audit_log=None):
+    """Create a ticket and store it.
+
+    Return the ticket, or None if the title is blank.
+    """
     if not title or not title.strip():
         return None
     ticket_id = str(max((int(key) for key in TICKETS), default=0) + 1)
@@ -24,7 +27,7 @@ def create_ticket(title, description, reporter, priority="medium", category="gen
 
 
 def assign_ticket(ticket_id, agent):
-    """Assign a ticket to an agent. Return False if the ticket does not exist."""
+    """Assign a ticket to an agent. Return False if it does not exist."""
     try:
         TICKETS[ticket_id]["assignee"] = agent
     except KeyError:
@@ -34,7 +37,7 @@ def assign_ticket(ticket_id, agent):
 
 
 def update_status(ticket_id, status):
-    """Set a ticket's status. Return the ticket, or None if it does not exist."""
+    """Set a ticket's status. Return the ticket, or None if not found."""
     ticket = TICKETS.get(ticket_id)
     if ticket is None:
         logging.warning("Cannot update: no ticket with id %s", ticket_id)
@@ -92,8 +95,10 @@ def is_open(ticket_id):
 def main():
     """Run the demo."""
     logging.basicConfig(level=logging.INFO)
-    create_ticket("Cannot sign in", "Password reset link fails", "alex@example.com")
-    create_ticket("Billing question", "Charged twice", "lee@example.com", "high")
+    create_ticket(
+        "Cannot sign in", "Password reset link fails", "alex@example.com")
+    create_ticket(
+        "Billing question", "Charged twice", "lee@example.com", "high")
     assign_ticket("1", "agent-01")
     update_status("1", "in_progress")
     print_ticket_report()
